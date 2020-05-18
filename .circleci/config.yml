@@ -1,0 +1,33 @@
+version: 2.1
+orbs:
+  aws: circleci/aws-cli@1.0.0
+  secrethub: secrethub/cli@1.0.1
+
+jobs:
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      AWS_ACCESS_KEY_ID: secrethub://company/demo/aws/access_key_id
+      AWS_SECRET_ACCESS_KEY: secrethub://company/demo/aws/secret_access_key
+      AWS_ACCOUNT_ID: secrethub://company/demo/aws/account_id
+      AWS_DEFAULT_REGION: eu-west-1
+    steps:
+      - checkout
+      - setup_remote_docker
+      - aws/install
+      - secrethub/exec:
+          step-name: Build and publish Docker image
+          command: |
+            DOCKER_REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+            docker build -t $DOCKER_REGISTRY/company/demo .
+            aws ecr get-login-password | docker login -u AWS --password-stdin $DOCKER_REGISTRY
+            docker push $DOCKER_REGISTRY/company/demo
+      - secrethub/exec:
+          step-name: Deploy to AWS ECS
+          command: |
+            aws ecs update-service --cluster SecretHubDemoCluster --service SecretHubDemo --force-new-deployment
+workflows:
+  deploy:
+    jobs:
+      - deploy
