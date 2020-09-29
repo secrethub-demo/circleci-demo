@@ -44,13 +44,13 @@
 	</style>
 
 	<script>
-		function processResult(status, icon, color, result){
-            $("#status").html(status);
-            $("#animation").attr("class", "fas fa-"+icon+" fa-5x");
-            $("#animation").css("color", color);
-            if(result !== "") {
-                $(".result-container").attr("hidden",false);
-				 try {
+		function processResult(status, icon, color, result) {
+			$("#status").html(status);
+			$("#animation").attr("class", "fas fa-" + icon + " fa-5x");
+			$("#animation").css("color", color);
+			if (result !== "") {
+				$(".result-container").attr("hidden", false);
+				try {
 					j = JSON.parse(result);
 					$("#result").html(j['message']);
 				} catch (e) {
@@ -59,39 +59,36 @@
 			}
 		}
 
-		function processError(message){
-            processResult("An error occurred!", "times", "red", message);
+		function processError(message) {
+			processResult("An error occurred!", "times", "red", message);
 		}
 
-		$(function(){
-		    $.get("/api", {}, function(res, status, xhr){
-		        if(xhr.status === 200) {
-                    processResult("Successfully connected to https://demo.secrethub.io/api!", "check", "green", res);
-                } else {
+		$(function () {
+			$.get("/api", {}, function (res, status, xhr) {
+				if (xhr.status === 200) {
+					processResult("Successfully connected to https://demo.secrethub.io/api!", "check", "green", res);
+				} else {
 					console.log(res, status, xhr);
-                    processError(res);
+					processError(res);
 				}
-			}).catch(function(res){
-                processError(res.responseText);
+			}).catch(function (res) {
+				processError(res.responseText);
 			});
 		});
 	</script>
 </head>
 
 <body class="text-center">
-<div class="container">
-	<img class="mb-4" src="https://secrethub.io/img/secrethub-logo-rgb-shield-square.png" alt="SecretHub logo" width="60" height="60">
-	<h1 class="h3 mb-3 font-weight-normal">Demo App</h1>
-	<i id="animation" class="fas fa-spinner fa-spin fa-3x"> </i>
-	<p id="status">Trying to connect to https://demo.secrethub.io/api...</p>
-	<div class="result-container mt-3 card" hidden>
-		<div class="card-header">
-			Result
+	<div class="container">
+		<img class="mb-4" src="https://secrethub.io/img/secrethub-logo-rgb-shield-square.png" alt="SecretHub logo" width="60" height="60">
+		<h1 class="h3 mb-3 font-weight-normal">Demo App</h1>
+		<i id="animation" class="fas fa-spinner fa-spin fa-3x"> </i>
+		<p id="status">Trying to connect to https://demo.secrethub.io/api...</p>
+		<div class="result-container mt-3 card" hidden>
+			<div class="card-header">Result</div>
+			<div class="card-body" id="result"></div>
 		</div>
-		<div class="card-body" id="result">
-		</div>
+		<p class="mt-5 mb-3 text-muted">Read the <a href="https://secrethub.io/docs/reference/cli/demo/" target="_blank">documentation</a> for this app</p>
 	</div>
-	<p class="mt-5 mb-3 text-muted">Read the <a href="https://secrethub.io/docs/reference/cli/demo/" target="_blank">documentation</a> for this app</p>
-</div>
 </body>
 </html>
